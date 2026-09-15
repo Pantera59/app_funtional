@@ -1,0 +1,52 @@
+@import 'tailwindcss';
+
+/* Dark mode follows the `dark` class on <html> (set by ThemeToggle and the inline script in layout.tsx). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Brand color in one place: swap amber for another palette to rebrand the whole app. */
+@theme inline {
+  --color-brand-50: var(--color-amber-50);
+  --color-brand-100: var(--color-amber-100);
+  --color-brand-200: var(--color-amber-200);
+  --color-brand-300: var(--color-amber-300);
+  --color-brand-400: var(--color-amber-400);
+  --color-brand-500: var(--color-amber-500);
+  --color-brand-600: var(--color-amber-600);
+  --color-brand-700: var(--color-amber-700);
+  --color-brand-800: var(--color-amber-800);
+  --color-brand-900: var(--color-amber-900);
+  --color-brand-950: var(--color-amber-950);
+}
+
+@theme {
+  /* In-between zinc shades the design uses for hairline borders and hovers. */
+  --color-zinc-150: oklch(94.4% 0.0025 286);
+  --color-zinc-850: oklch(24.2% 0.0055 286);
+
+  --animate-page-in: page-in 0.25s ease-out both;
+
+  @keyframes page-in {
+    from {
+      opacity: 0;
+      transform: translateY(15px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-zinc-50 font-sans text-zinc-900 antialiased transition-colors duration-300 dark:bg-zinc-950 dark:text-zinc-100;
+  }
+}

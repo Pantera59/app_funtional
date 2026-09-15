@@ -1,0 +1,3 @@
+# unrs-resolver ships prebuilt binaries; its install script only builds a fallback.
+allowBuilds:
+  unrs-resolver: false
