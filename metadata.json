@@ -1,0 +1,6 @@
+{
+  "name": "Kangaroo Coach",
+  "description": "Planificador de rutinas y WODs minimalista con control de inventario de materiales y marca personal Kangaroo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
