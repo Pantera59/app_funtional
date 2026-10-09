@@ -69,6 +69,13 @@ El primer uso real será en el estudio de entrenamiento funcional donde trabaja 
    - Todos los datos se guardan en el navegador (localStorage).
    - Todas las imágenes y el código QR son locales: no se llama a servicios externos.
 
+6. **Reglas de planeación (`/reglas`) y modo funcional**
+   - Perfil de reglas editable: duración objetivo (50–55 min), 4 bloques fijos con rango y minutos planeados, calentamiento fijo + activación, esquemas de series, estaciones (con estación condicional), cardio por intervalos, estiramiento y rotación.
+   - Banco de ejercicios propio (precargado con los ejercicios del coach) que se puede ampliar, editar y desactivar.
+   - Historial de clases funcionales para la regla de rotación (no repetir el ejercicio principal de las últimas N clases).
+   - En el planificador, el modo **Funcional** genera la clase con estas reglas, el material activo y el historial, y ajusta el tiempo quitando la estación condicional o una vuelta de cardio.
+   - Botón **Exportar reglas**: Markdown (copiar o descargar) y JSON con el perfil, el banco y las últimas 5 clases, para usarlo como contexto en un chat con Claude.
+
 ### Fuera de alcance en el MVP
 
 - Cuentas de usuario, inicio de sesión y roles.
