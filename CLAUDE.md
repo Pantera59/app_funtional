@@ -21,7 +21,7 @@ There is no backend: all state lives in the browser's `localStorage`. Hosting ta
 
 ## Architecture
 
-- **Routes** (`src/app`): `/` planner, `/materiales` inventory, `/coach` timer, `/alumno` student view.
+- **Routes** (`src/app`): `/` planner, `/materiales` inventory, `/reglas` planning rules (functional mode), `/coach` timer, `/alumno` student view.
   - Pages and `layout.tsx` are server components that render static shells.
   - Interactive parts are client components under `src/components/<feature>`.
   - Static content is passed into client components as props or children (e.g. `DashboardWelcome` → `KangarooDashboard`'s `welcome` prop) so it stays out of the client bundle.
@@ -44,6 +44,17 @@ There is no backend: all state lives in the browser's `localStorage`. Hosting ta
     - **Order matters**, because the generator often takes the first match.
     - `swaps(name, overrides)` fills restriction swaps that keep the same exercise.
   - `plan-rules.ts`: Plan B (−30% on `Metabólico` blocks, once per plan) and note updates.
+- **Functional mode** (`src/lib/domain/functional`) is a second generator, chosen with the planner's Clásico/Funcional switch. It does not change the classic generator.
+  - `generateFunctionalClass(options, profile, bank, deps)` returns a regular `WorkoutPlan` (with `mode: 'funcional'`) plus a `ClassRecord` for history, so coach, student and Plan B work unchanged.
+    - Block mapping: Cardio → `'Metabólico'` and Estiramiento → `'Cierre'`. The coach's block names go in `block.name`.
+  - The rules profile (`default-profile.ts`), exercise bank (`exercise-bank.ts`) and class history are persisted under `STORAGE_KEYS.rulesProfile`, `exerciseBank` and `classHistory`. They are edited in `/reglas` (`src/components/rules`).
+  - Time uses fixed minutes per block (`timing.ts`). Over the target it drops the conditional station, then one cardio round.
+  - Material: `equipment` is a list of requirement groups, matched case-insensitively. Each group needs any one of its materials, and every group must be met (`availability.ts`). The functional material is part of `DEFAULT_MATERIALS`; `withDefaultMaterials` appends it to inventories saved earlier.
+  - Rotation (`rotation.ts`): a station's main exercise (A, or the combo) is skipped if it was a main in the last N classes. Stations fall back to other patterns of the focus, and repeat only as a last resort, with a notice.
+  - Upper body pairs push with pull in A/B stations. Push and pull mains never use combos, so the balance holds.
+  - Stations are tagged with `WorkoutExercise.station` (`A/B`, `Combo`, `Simple`, `conditional`). The student view of a functional plan is text only.
+  - `export-rules.ts` builds the Markdown/JSON context (profile, active bank, last 5 classes) for pasting into a chat.
+  - The stored bank is the user's copy: changes to the seed in code do not reach browsers that already saved a bank.
   - `constants.ts`: the single source for restrictions, focus options, material categories and statuses, default materials, Plan B thresholds and storage keys. Types in `types.ts` are derived from these `as const` arrays.
   - String unions are matched by exact value, including accents (`'Metabólico'`).
 - **UI kit** (`src/components/ui`):
@@ -61,3 +72,13 @@ There is no backend: all state lives in the browser's `localStorage`. Hosting ta
 
 - A plan lives only on the device that generated it, so the student QR code does not share it with other phones. Cross-device sharing is Phase 2 in `docs/PRD.md`.
 - The coach clock is a demo simulation that advances one class minute per real second.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

@@ -33,7 +33,22 @@ export const STORAGE_KEYS = {
   plan: 'kangaroo_current_plan',
   theme: 'kangaroo_theme',
   dashboardDefault: 'kangaroo_show_dashboard_default',
+  rulesProfile: 'functional_rules_profile',
+  exerciseBank: 'functional_exercise_bank',
+  classHistory: 'functional_class_history',
+  plannerMode: 'kangaroo_planner_mode',
 } as const;
+
+/** Material used by the functional-mode exercise bank. The classic generator ignores it. */
+export const FUNCTIONAL_MATERIALS: Material[] = [
+  { name: 'Mancuernas ligeras', category: 'Pesos Libres', desc: 'Mancuernas de carga ligera', quantity: 10, status: 'Excelente', active: true },
+  { name: 'Mancuernas medias', category: 'Pesos Libres', desc: 'Mancuernas de carga media', quantity: 10, status: 'Excelente', active: true },
+  { name: 'Liga elástica', category: 'Accesorios', desc: 'Liga larga con o sin asas', quantity: 10, status: 'Excelente', active: true },
+  { name: 'Liga de resistencia', category: 'Accesorios', desc: 'Mini band de resistencia', quantity: 10, status: 'Excelente', active: true },
+  { name: 'Polainas', category: 'Carga Funcional', desc: 'Pesas para tobillo o muñeca', quantity: 10, status: 'Excelente', active: true },
+  { name: 'Pelota', category: 'Accesorios', desc: 'Pelota para core', quantity: 10, status: 'Excelente', active: true },
+  { name: 'Discos', category: 'Pesos Libres', desc: 'Discos sueltos (también para elevar talones)', quantity: 10, status: 'Excelente', active: true },
+];
 
 export const DEFAULT_MATERIALS: Material[] = [
   { name: 'Kettlebell', category: 'Pesos Libres', desc: 'Pesas rusas de varios kilajes', quantity: 12, status: 'Excelente', active: true },
@@ -44,6 +59,7 @@ export const DEFAULT_MATERIALS: Material[] = [
   { name: 'Sandbag', category: 'Carga Funcional', desc: 'Saco de arena inestable', quantity: 4, status: 'Excelente', active: true },
   { name: 'Medicine Ball', category: 'Accesorios', desc: 'Balones medicinales pesados', quantity: 10, status: 'Excelente', active: true },
   { name: 'Jump Rope', category: 'Acondicionamiento', desc: 'Cuerdas de saltar individuales', quantity: 15, status: 'Excelente', active: true },
+  ...FUNCTIONAL_MATERIALS,
 ];
 
 const DEFAULT_MATERIAL_NAMES = new Set(DEFAULT_MATERIALS.map((m) => m.name));
@@ -53,3 +69,10 @@ export const isDefaultMaterial = (name: string) => DEFAULT_MATERIAL_NAMES.has(na
 
 export const isBodyweight = (equipment: string) =>
   BODYWEIGHT_EQUIPMENT.includes(equipment.toLowerCase());
+
+/** Adds built-in materials missing from data saved before they existed. Returns the same array if nothing is missing. */
+export function withDefaultMaterials(materials: Material[]): Material[] {
+  const names = new Set(materials.map((m) => m.name));
+  const missing = DEFAULT_MATERIALS.filter((m) => !names.has(m.name));
+  return missing.length > 0 ? [...materials, ...missing] : materials;
+}

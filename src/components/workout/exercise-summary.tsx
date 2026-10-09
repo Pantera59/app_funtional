@@ -1,7 +1,8 @@
 import { Check } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/cn';
-import type { WorkoutExercise } from '@/lib/domain/types';
+import type { StationInfo, WorkoutExercise } from '@/lib/domain/types';
 import { humanize } from '@/lib/format';
 
 interface ExerciseSummaryProps {
@@ -32,6 +33,7 @@ export function ExerciseSummary({ exercise, checked = false, leading, className 
               Variante por {humanize(exercise.appliedRestriction)}
             </span>
           )}
+          {exercise.station && <StationBadges station={exercise.station} />}
         </span>
       </span>
       <span
@@ -42,6 +44,23 @@ export function ExerciseSummary({ exercise, checked = false, leading, className 
       >
         {exercise.reps}
       </span>
+    </span>
+  );
+}
+
+/** "Est. 2 · A/B · A", "Est. 3 · Combo" and the conditional flag, so station formats are never confused. */
+function StationBadges({ station }: { station: StationInfo }) {
+  const label = [`Est. ${station.number}`, station.kind, station.role].filter(Boolean).join(' · ');
+  return (
+    <span className="mt-1.5 flex flex-wrap items-center gap-1.5">
+      <Badge size="sm" tone={station.kind === 'Combo' ? 'solid' : 'brand'}>
+        {label}
+      </Badge>
+      {station.conditional && (
+        <Badge size="sm" tone="danger">
+          Condicional · si alcanza el tiempo
+        </Badge>
+      )}
     </span>
   );
 }
