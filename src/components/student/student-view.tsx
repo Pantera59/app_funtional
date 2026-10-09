@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowDown, ArrowUp } from 'lucide-react';
+import { ArrowDown, ArrowUp, NotebookPen } from 'lucide-react';
 import Image from 'next/image';
 import { KangarooIcon } from '@/components/brand/kangaroo-icon';
 import { Card } from '@/components/ui/card';
@@ -26,6 +26,11 @@ export function StudentView() {
   const checklist = useChecklist();
 
   const total = countExercises(plan);
+  // Functional classes are text only for now: no photo or muscle diagram.
+  const textOnly = plan.mode === 'funcional';
+  const classMinutes = textOnly
+    ? plan.blocks.reduce((sum, block) => sum + block.durationMinutes, 0)
+    : CLASS_DURATION_MINUTES;
   const progress = total > 0 ? Math.round((checklist.count / total) * 100) : 0;
 
   return (
@@ -42,7 +47,7 @@ export function StudentView() {
           {plan.focus}
         </h1>
         <Eyebrow className="mt-2">
-          Inicio: {plan.startTime} · Clase de {CLASS_DURATION_MINUTES} minutos
+          Inicio: {plan.startTime} · Clase de {classMinutes} minutos
         </Eyebrow>
 
         <div className="mt-6 border-t border-zinc-100 pt-5 dark:border-zinc-800/60">
@@ -86,33 +91,48 @@ export function StudentView() {
                     onToggle={() => checklist.toggle(block.id, exerciseIndex)}
                   />
 
-                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-zinc-200/50 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950">
-                    <Image
-                      src={exercise.baseExercise.imageUrl}
-                      alt={exercise.actualName}
-                      fill
-                      sizes="(max-width: 448px) 100vw, 448px"
-                      className={cn(
-                        'object-cover transition-all duration-700',
-                        checked ? 'grayscale contrast-75' : 'hover:scale-105',
-                      )}
-                    />
-                  </div>
-
-                  <MuscleAnatomyVisualizer pattern={exercise.baseExercise.pattern} />
-
-                  <div className="grid grid-cols-2 gap-3">
-                    {SCALING_OPTIONS.map(({ label, icon: Icon, field }) => (
-                      <Card key={field} variant="inset">
+                  {textOnly ? (
+                    exercise.baseExercise.regression && (
+                      <Card variant="inset">
                         <Eyebrow size="xs" className="mb-1.5 flex items-center gap-1">
-                          <Icon className="size-3.5" /> {label}
+                          <NotebookPen className="size-3.5" /> Notas técnicas
                         </Eyebrow>
                         <p className="text-xs leading-relaxed font-medium text-zinc-600 dark:text-zinc-400">
-                          {exercise.baseExercise[field]}
+                          {exercise.baseExercise.regression}
                         </p>
                       </Card>
-                    ))}
-                  </div>
+                    )
+                  ) : (
+                    <>
+                      <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-zinc-200/50 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950">
+                        <Image
+                          src={exercise.baseExercise.imageUrl}
+                          alt={exercise.actualName}
+                          fill
+                          sizes="(max-width: 448px) 100vw, 448px"
+                          className={cn(
+                            'object-cover transition-all duration-700',
+                            checked ? 'grayscale contrast-75' : 'hover:scale-105',
+                          )}
+                        />
+                      </div>
+
+                      <MuscleAnatomyVisualizer pattern={exercise.baseExercise.pattern} />
+
+                      <div className="grid grid-cols-2 gap-3">
+                        {SCALING_OPTIONS.map(({ label, icon: Icon, field }) => (
+                          <Card key={field} variant="inset">
+                            <Eyebrow size="xs" className="mb-1.5 flex items-center gap-1">
+                              <Icon className="size-3.5" /> {label}
+                            </Eyebrow>
+                            <p className="text-xs leading-relaxed font-medium text-zinc-600 dark:text-zinc-400">
+                              {exercise.baseExercise[field]}
+                            </p>
+                          </Card>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </li>
               );
             })}

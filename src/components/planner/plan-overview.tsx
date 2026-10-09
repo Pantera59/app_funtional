@@ -1,6 +1,6 @@
 'use client';
 
-import { QrCode } from 'lucide-react';
+import { Info, QrCode } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -48,6 +48,7 @@ export function PlanOverview({ plan }: { plan: WorkoutPlan }) {
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <Badge tone="solid">WOD activo</Badge>
+              {plan.mode === 'funcional' && <Badge tone="brand">Clase {plan.classNumber} · Modo funcional</Badge>}
               <Eyebrow>Inicio programado: {plan.startTime}</Eyebrow>
             </div>
             <h3 className="mt-3 text-lg font-black tracking-tight text-zinc-950 uppercase dark:text-zinc-50">
@@ -58,6 +59,16 @@ export function PlanOverview({ plan }: { plan: WorkoutPlan }) {
             <QrCode className="size-4" /> Compartir con alumnos
           </Button>
         </div>
+
+        {plan.notices && plan.notices.length > 0 && (
+          <ul className="space-y-1.5 border-b border-zinc-150 bg-brand-500/[0.03] px-6 py-4 md:px-8 dark:border-zinc-800">
+            {plan.notices.map((notice) => (
+              <li key={notice} className="flex items-start gap-2 text-[11px] font-medium text-zinc-600 dark:text-zinc-400">
+                <Info className="mt-0.5 size-3.5 shrink-0 text-brand-500" /> {notice}
+              </li>
+            ))}
+          </ul>
+        )}
 
         <ol className="space-y-8 p-6 md:p-8">
           {plan.blocks.map((block, index) => (
