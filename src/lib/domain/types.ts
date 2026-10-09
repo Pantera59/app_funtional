@@ -31,7 +31,7 @@ export interface Exercise {
 }
 
 export type BlockType = 'Calentamiento' | 'Fuerza' | 'Metabólico' | 'Cierre';
-export type WorkoutFormat = 'Circuit' | 'AMRAP' | 'EMOM' | 'A/B' | 'Parejas 1:1' | 'Flow';
+export type WorkoutFormat = 'Circuit' | 'AMRAP' | 'EMOM' | 'A/B' | 'Parejas 1:1' | 'Flow' | 'Estaciones' | 'Intervalos';
 
 export interface WorkoutExercise {
   baseExercise: Exercise;
@@ -39,6 +39,17 @@ export interface WorkoutExercise {
   actualName: string;
   reps: string;
   appliedRestriction?: Restriction;
+  /** Functional mode: the strength station this exercise belongs to. */
+  station?: StationInfo;
+}
+
+export interface StationInfo {
+  number: number;
+  /** 'A/B': two exercises alternated. 'Combo': A + B + C in one movement. 'Simple': no partner was available. */
+  kind: 'A/B' | 'Combo' | 'Simple';
+  role?: 'A' | 'B';
+  /** Done only if there is time left. */
+  conditional: boolean;
 }
 
 export interface WorkoutBlock {
@@ -65,6 +76,11 @@ export interface WorkoutPlan {
   blocks: WorkoutBlock[];
   coachNotes: string;
   planBActivated: boolean;
+  /** Absent on classic plans. */
+  mode?: 'funcional';
+  classNumber?: number;
+  /** Functional mode: time adjustments and rule fallbacks, for the coach. */
+  notices?: string[];
 }
 
 export interface WorkoutOptions {
