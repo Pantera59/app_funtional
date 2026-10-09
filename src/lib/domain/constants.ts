@@ -36,6 +36,7 @@ export const STORAGE_KEYS = {
   rulesProfile: 'functional_rules_profile',
   exerciseBank: 'functional_exercise_bank',
   classHistory: 'functional_class_history',
+  plannerMode: 'kangaroo_planner_mode',
 } as const;
 
 /** Material used by the functional-mode exercise bank. The classic generator ignores it. */
