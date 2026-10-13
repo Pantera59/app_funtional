@@ -7,21 +7,30 @@ import { Input } from '@/components/ui/field';
 import { IconTile } from '@/components/ui/icon-tile';
 import { Modal } from '@/components/ui/modal';
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
+import { useStudentLink } from '@/hooks/use-student-class';
+import type { WorkoutPlan } from '@/lib/domain/types';
 
 const LOCAL_HOSTNAMES = ['localhost', '127.0.0.1', '[::1]'];
 
-export function ShareWodModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+interface ShareWodModalProps {
+  plan: WorkoutPlan;
+  open: boolean;
+  onClose: () => void;
+}
+
+export function ShareWodModal({ plan, open, onClose }: ShareWodModalProps) {
   return (
     <Modal open={open} onClose={onClose} label="Compartir WOD con alumnos" className="max-w-sm text-center">
-      <ShareWodContent onNavigate={onClose} />
+      <ShareWodContent plan={plan} />
     </Modal>
   );
 }
 
 /** Separate component so `window` is only read once the modal is actually open. */
-function ShareWodContent({ onNavigate }: { onNavigate: () => void }) {
+function ShareWodContent({ plan }: { plan: WorkoutPlan }) {
   const { copied, copy } = useCopyToClipboard();
-  const url = new URL('/alumno', window.location.origin).toString();
+  // The class travels inside the link, so any phone can open it without an account or this device's storage.
+  const url = useStudentLink(plan);
   const isLocalhost = LOCAL_HOSTNAMES.includes(window.location.hostname);
 
   return (
@@ -31,12 +40,17 @@ function ShareWodContent({ onNavigate }: { onNavigate: () => void }) {
       </IconTile>
       <h3 className="text-sm font-black tracking-wider text-zinc-900 uppercase dark:text-zinc-100">Acceso alumnos</h3>
       <p className="mt-1.5 max-w-60 text-[11px] leading-relaxed text-zinc-400 dark:text-zinc-500">
-        Escanea el código QR o comparte el enlace para abrir la vista de alumno.
+        Escanea el código QR o comparte el enlace. Los alumnos solo ven la clase, sin cuenta ni acceso al resto de la
+        app.
       </p>
 
       {/* Generated on the device: no external QR service. */}
       <div className="my-6 rounded-2xl border border-zinc-150 bg-white p-4 shadow-md">
-        <QRCodeSVG value={url} size={144} marginSize={0} title="Código QR de la vista de alumno" />
+        {url ? (
+          <QRCodeSVG value={url} size={192} marginSize={0} title="Código QR de la vista de alumno" />
+        ) : (
+          <div className="size-48" aria-busy="true" />
+        )}
       </div>
 
       {isLocalhost && (
@@ -49,19 +63,20 @@ function ShareWodContent({ onNavigate }: { onNavigate: () => void }) {
       <div className="mb-5 flex w-full items-center gap-2">
         <Input
           readOnly
-          value={url}
+          value={url ?? ''}
           aria-label="Enlace de la vista de alumno"
           onFocus={(event) => event.currentTarget.select()}
           className="truncate"
         />
-        <Button size="sm" variant={copied ? 'secondary' : 'primary'} onClick={() => copy(url)}>
+        <Button size="sm" variant={copied ? 'secondary' : 'primary'} disabled={!url} onClick={() => url && copy(url)}>
           {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
           <span aria-live="polite">{copied ? 'Copiado' : 'Copiar'}</span>
         </Button>
       </div>
 
-      <ButtonLink href="/alumno" size="lg" onClick={onNavigate}>
-        <Smartphone className="size-4" /> Ir a vista de alumno
+      {/* New tab: the student view has no navigation back to the coach screens. */}
+      <ButtonLink href={url ?? '/alumno'} target="_blank" rel="noopener" size="lg">
+        <Smartphone className="size-4" /> Ver como alumno
       </ButtonLink>
     </div>
   );

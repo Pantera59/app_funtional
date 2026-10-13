@@ -109,7 +109,7 @@ export function PlanOverview({ plan }: { plan: WorkoutPlan }) {
         </ol>
       </Card>
 
-      <ShareWodModal open={shareOpen} onClose={closeShare} />
+      <ShareWodModal plan={plan} open={shareOpen} onClose={closeShare} />
     </section>
   );
 }

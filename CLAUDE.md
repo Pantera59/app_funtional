@@ -21,7 +21,8 @@ There is no backend: all state lives in the browser's `localStorage`. Hosting ta
 
 ## Architecture
 
-- **Routes** (`src/app`): `/` planner, `/materiales` inventory, `/reglas` planning rules (functional mode), `/coach` timer, `/alumno` student view.
+- **Routes** (`src/app`): `/` planner, `/materiales` inventory, `/reglas` planning rules, `/coach` timer, `/alumno` student view.
+  - The coach routes live in the `(coach)` route group, whose layout adds the header, nav and `WodActionBar`. `/alumno` sits outside it with its own header and no links, so a student opening the QR only sees the class.
   - Pages and `layout.tsx` are server components that render static shells.
   - Interactive parts are client components under `src/components/<feature>`.
   - Static content is passed into client components as props or children (e.g. `DashboardWelcome` → `KangarooDashboard`'s `welcome` prop) so it stays out of the client bundle.
@@ -44,7 +45,7 @@ There is no backend: all state lives in the browser's `localStorage`. Hosting ta
     - **Order matters**, because the generator often takes the first match.
     - `swaps(name, overrides)` fills restriction swaps that keep the same exercise.
   - `plan-rules.ts`: Plan B (−30% on `Metabólico` blocks, once per plan) and note updates.
-- **Functional mode** (`src/lib/domain/functional`) is a second generator, chosen with the planner's Clásico/Funcional switch. It does not change the classic generator.
+- **Functional mode** (`src/lib/domain/functional`) is the generator the planner uses. The classic generator (`generate-workout.ts`) is no longer reachable from the UI but is kept, with its tests.
   - `generateFunctionalClass(options, profile, bank, deps)` returns a regular `WorkoutPlan` (with `mode: 'funcional'`) plus a `ClassRecord` for history, so coach, student and Plan B work unchanged.
     - Block mapping: Cardio → `'Metabólico'` and Estiramiento → `'Cierre'`. The coach's block names go in `block.name`.
   - The rules profile (`default-profile.ts`), exercise bank (`exercise-bank.ts`) and class history are persisted under `STORAGE_KEYS.rulesProfile`, `exerciseBank` and `classHistory`. They are edited in `/reglas` (`src/components/rules`).
@@ -52,11 +53,12 @@ There is no backend: all state lives in the browser's `localStorage`. Hosting ta
   - Material: `equipment` is a list of requirement groups, matched case-insensitively. Each group needs any one of its materials, and every group must be met (`availability.ts`). The functional material is part of `DEFAULT_MATERIALS`; `withDefaultMaterials` appends it to inventories saved earlier.
   - Rotation (`rotation.ts`): a station's main exercise (A, or the combo) is skipped if it was a main in the last N classes. Stations fall back to other patterns of the focus, and repeat only as a last resort, with a notice.
   - Upper body pairs push with pull in A/B stations. Push and pull mains never use combos, so the balance holds.
-  - Stations are tagged with `WorkoutExercise.station` (`A/B`, `Combo`, `Simple`, `conditional`). The student view of a functional plan is text only.
+  - Stations are tagged with `WorkoutExercise.station` (`A/B`, `Combo`, `Simple`, `conditional`).
   - `export-rules.ts` builds the Markdown/JSON context (profile, active bank, last 5 classes) for pasting into a chat.
   - The stored bank is the user's copy: changes to the seed in code do not reach browsers that already saved a bank.
   - `constants.ts`: the single source for restrictions, focus options, material categories and statuses, default materials, Plan B thresholds and storage keys. Types in `types.ts` are derived from these `as const` arrays.
   - String unions are matched by exact value, including accents (`'Metabólico'`).
+- **Student view** (`student-class.ts`): `toStudentClass(plan)` keeps only what students see (no coach notes, notices or conditional stations). The share modal deflates it into the link hash (`/alumno#c=...`, ~1 KB), so any phone opens the class with no account and no shared storage. Without a hash, `/alumno` falls back to the plan on this device. The view is text only and read only (no checkboxes).
 - **UI kit** (`src/components/ui`):
   - Components are built with `class-variance-authority` and `cn()` (`clsx` + `tailwind-merge`).
   - Reuse `Button`/`ButtonLink`, `Card` (`panel`/`section`/`tile`/`inset`), `Eyebrow`, `Field` + `Input`/`Select`/`Textarea`, `SegmentedControl` (its `segmentVariants` also style the nav links), `Modal`, `Badge`, `IconTile`, `PanelHeader`, `EmptyState`.
@@ -70,7 +72,7 @@ There is no backend: all state lives in the browser's `localStorage`. Hosting ta
 
 ## Known limitations
 
-- A plan lives only on the device that generated it, so the student QR code does not share it with other phones. Cross-device sharing is Phase 2 in `docs/PRD.md`.
+- The QR link is a snapshot: edits or Plan B made after sharing need a new QR. Live cross-device sharing is Phase 2 in `docs/PRD.md`.
 - The coach clock is a demo simulation that advances one class minute per real second.
 
 <!-- BEGIN:nextjs-agent-rules -->
