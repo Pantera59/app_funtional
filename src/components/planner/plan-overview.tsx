@@ -12,6 +12,7 @@ import { ExerciseSummary } from '@/components/workout/exercise-summary';
 import { countExercises } from '@/lib/domain/plan-rules';
 import type { WorkoutPlan } from '@/lib/domain/types';
 import { useAppState } from '@/providers/app-state-provider';
+import { DownloadClassButtons } from './download-class-buttons';
 import { ShareWodModal } from './share-wod-modal';
 
 export function PlanOverview({ plan }: { plan: WorkoutPlan }) {
@@ -55,9 +56,12 @@ export function PlanOverview({ plan }: { plan: WorkoutPlan }) {
               Enfoque: {plan.focus}
             </h3>
           </div>
-          <Button className="w-full sm:w-auto" onClick={() => setShareOpen(true)}>
-            <QrCode className="size-4" /> Compartir con alumnos
-          </Button>
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <DownloadClassButtons plan={plan} />
+            <Button className="w-full sm:w-auto" onClick={() => setShareOpen(true)}>
+              <QrCode className="size-4" /> Compartir con alumnos
+            </Button>
+          </div>
         </div>
 
         {plan.notices && plan.notices.length > 0 && (

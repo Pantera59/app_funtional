@@ -5,19 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Eyebrow } from '@/components/ui/eyebrow';
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
+import { download } from '@/lib/download';
 import { EXPORT_RECENT_CLASSES } from '@/lib/domain/functional/constants';
 import { buildRulesJson, buildRulesMarkdown } from '@/lib/domain/functional/export-rules';
 import { useAppState } from '@/providers/app-state-provider';
-
-/** Saves text as a file on the device; nothing leaves the browser. */
-function download(filename: string, content: string, type: string) {
-  const url = URL.createObjectURL(new Blob([content], { type }));
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
-}
 
 export function RulesExportPanel() {
   const { rulesProfile, exerciseBank, classHistory, activeMaterialNames } = useAppState();
