@@ -10,26 +10,24 @@ import { useLocalStorage } from '@/hooks/use-local-storage';
 import { cn } from '@/lib/cn';
 import { STORAGE_KEYS } from '@/lib/domain/constants';
 import { getSessionSuggestions } from '@/lib/domain/suggestions';
-import type { Focus, Restriction } from '@/lib/domain/types';
+import type { Focus } from '@/lib/domain/types';
 
 interface KangarooDashboardProps {
   /** Server-rendered welcome content. */
   welcome: ReactNode;
   focus: Focus;
-  restrictions: Restriction[];
   materialCount: number;
 }
 
-export function KangarooDashboard({ welcome, focus, restrictions, materialCount }: KangarooDashboardProps) {
+export function KangarooDashboard({ welcome, focus, materialCount }: KangarooDashboardProps) {
   const [openByDefault, setOpenByDefault] = useLocalStorage(STORAGE_KEYS.dashboardDefault, true);
   const [openOverride, setOpenOverride] = useState<boolean | null>(null);
   const isOpen = openOverride ?? openByDefault;
 
-  const suggestions = getSessionSuggestions({ focus, restrictions, materialCount });
+  const suggestions = getSessionSuggestions({ focus, restrictions: [], materialCount });
   const summary = [
     { label: 'Enfoque seleccionado', value: focus },
     { label: 'Materiales disponibles', value: `${materialCount} activos`, highlight: true },
-    { label: 'Restricciones activadas', value: restrictions.length || 'Ninguna' },
   ];
 
   return (
@@ -85,7 +83,7 @@ export function KangarooDashboard({ welcome, focus, restrictions, materialCount 
               <Badge>Motor de reglas</Badge>
             </div>
 
-            <div className="mb-5 grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="mb-5 grid grid-cols-1 gap-4 md:grid-cols-2">
               {summary.map((item) => (
                 <Card key={item.label} variant="inset" className="text-center">
                   <Eyebrow size="xs" className="text-[8px] tracking-widest">
