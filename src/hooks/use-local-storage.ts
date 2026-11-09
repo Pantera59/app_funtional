@@ -8,7 +8,8 @@ const listeners = new Map<string, Set<Listener>>();
 /** Parsed values cached by raw string so snapshots stay referentially stable. */
 const cache = new Map<string, { raw: string; value: unknown }>();
 
-function readRaw(key: string): string | null {
+/** The raw JSON string stored under `key`, or null. */
+export function readRawStorage(key: string): string | null {
   try {
     return window.localStorage.getItem(key);
   } catch {
@@ -17,7 +18,7 @@ function readRaw(key: string): string | null {
 }
 
 export function readStorage<T>(key: string, fallback: T): T {
-  const raw = readRaw(key);
+  const raw = readRawStorage(key);
   if (raw === null) return fallback;
 
   const cached = cache.get(key);
@@ -43,7 +44,8 @@ export function writeStorage<T>(key: string, value: T) {
   listeners.get(key)?.forEach((listener) => listener());
 }
 
-function subscribe(key: string, listener: Listener) {
+/** Calls `listener` whenever `key` changes, in this tab (writeStorage) or another (storage event). Returns the unsubscribe. */
+export function subscribeStorage(key: string, listener: Listener) {
   const keyListeners = listeners.get(key) ?? new Set<Listener>();
   listeners.set(key, keyListeners);
   keyListeners.add(listener);
@@ -67,7 +69,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
   const [initial] = useState(initialValue);
 
   const value = useSyncExternalStore(
-    useCallback((listener: Listener) => subscribe(key, listener), [key]),
+    useCallback((listener: Listener) => subscribeStorage(key, listener), [key]),
     () => readStorage(key, initial),
     () => initial,
   );

@@ -9,6 +9,7 @@ import { Modal } from '@/components/ui/modal';
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
 import { useStudentLink } from '@/hooks/use-student-class';
 import type { WorkoutPlan } from '@/lib/domain/types';
+import { PublishClassPanel } from './publish-class-panel';
 
 const LOCAL_HOSTNAMES = ['localhost', '127.0.0.1', '[::1]'];
 
@@ -20,7 +21,7 @@ interface ShareWodModalProps {
 
 export function ShareWodModal({ plan, open, onClose }: ShareWodModalProps) {
   return (
-    <Modal open={open} onClose={onClose} label="Compartir WOD con alumnos" className="max-w-sm text-center">
+    <Modal open={open} onClose={onClose} label="Compartir WOD con alumnos" className="max-h-[92vh] max-w-sm overflow-y-auto text-center">
       <ShareWodContent plan={plan} />
     </Modal>
   );
@@ -78,6 +79,8 @@ function ShareWodContent({ plan }: { plan: WorkoutPlan }) {
       <ButtonLink href={url ?? '/alumno'} target="_blank" rel="noopener" size="lg">
         <Smartphone className="size-4" /> Ver como alumno
       </ButtonLink>
+
+      <PublishClassPanel plan={plan} />
     </div>
   );
 }

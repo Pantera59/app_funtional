@@ -4,18 +4,23 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { segmentedTrackClass, segmentVariants } from '@/components/ui/segmented-control';
 import { useIsClient } from '@/hooks/use-is-client';
+import { canAccess } from '@/lib/auth/roles';
 import { cn } from '@/lib/cn';
 import { useAppState } from '@/providers/app-state-provider';
+import { useProfile } from '@/providers/auth-provider';
 import { NAV_ITEMS } from './nav-items';
 
 export function NavTabs() {
   const pathname = usePathname();
   const { plan } = useAppState();
   const hasPlan = useIsClient() && plan !== null;
+  const profile = useProfile();
+  // Local mode has no users to manage; signed in, each role sees only its own sections.
+  const items = NAV_ITEMS.filter((item) => (profile ? canAccess(profile.role, item.area) : item.area === 'coach'));
 
   return (
     <nav aria-label="Secciones" className={cn(segmentedTrackClass, 'min-w-0 overflow-x-auto')}>
-      {NAV_ITEMS.map((item) => {
+      {items.map((item) => {
         const active = pathname === item.href;
         const disabled = item.requiresPlan && !hasPlan;
         return (

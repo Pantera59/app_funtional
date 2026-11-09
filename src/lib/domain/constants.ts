@@ -47,6 +47,7 @@ export const FUNCTIONAL_MATERIALS: Material[] = [
   { name: 'Polainas', category: 'Carga Funcional', desc: 'Pesas para tobillo o muñeca', quantity: 10, status: 'Excelente', active: true },
   { name: 'Pelota', category: 'Accesorios', desc: 'Pelota para core', quantity: 10, status: 'Excelente', active: true },
   { name: 'Discos', category: 'Pesos Libres', desc: 'Discos sueltos (también para elevar talones)', quantity: 10, status: 'Excelente', active: true },
+  { name: 'Bloque', category: 'Accesorios', desc: 'Bloque de yoga o espuma (entre rodillas, bajo los pies)', quantity: 10, status: 'Excelente', active: true },
 ];
 
 export const DEFAULT_MATERIALS: Material[] = [

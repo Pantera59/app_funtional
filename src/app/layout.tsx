@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { STORAGE_KEYS } from '@/lib/domain/constants';
 import { AppStateProvider } from '@/providers/app-state-provider';
+import { AuthProvider } from '@/providers/auth-provider';
+import { WorkspaceSyncProvider } from '@/providers/workspace-sync-provider';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -27,7 +29,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>
-        <AppStateProvider>{children}</AppStateProvider>
+        <AuthProvider>
+          <WorkspaceSyncProvider>
+            <AppStateProvider>{children}</AppStateProvider>
+          </WorkspaceSyncProvider>
+        </AuthProvider>
       </body>
     </html>
   );

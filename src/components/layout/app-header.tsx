@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { KangarooIcon } from '@/components/brand/kangaroo-icon';
 import { Eyebrow } from '@/components/ui/eyebrow';
 import { IconTile } from '@/components/ui/icon-tile';
+import { AccountMenu } from './account-menu';
 import { NavTabs } from './nav-tabs';
 import { ThemeToggle } from './theme-toggle';
 
@@ -21,7 +22,10 @@ export function AppHeader() {
           </span>
         </Link>
         <NavTabs />
-        <ThemeToggle />
+        <div className="flex shrink-0 items-center gap-2">
+          <ThemeToggle />
+          <AccountMenu />
+        </div>
       </div>
     </header>
   );
