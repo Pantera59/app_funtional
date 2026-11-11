@@ -31,6 +31,7 @@ interface SegmentedControlProps<T extends string> {
   size?: 'sm' | 'md';
   label: string;
   className?: string;
+  disabled?: boolean;
 }
 
 export function SegmentedControl<T extends string>({
@@ -40,17 +41,24 @@ export function SegmentedControl<T extends string>({
   size = 'md',
   label,
   className,
+  disabled,
 }: SegmentedControlProps<T>) {
   return (
-    <div role="radiogroup" aria-label={label} className={cn(segmentedTrackClass, size === 'sm' && 'rounded-xl p-1', className)}>
+    <div
+      role="radiogroup"
+      aria-label={label}
+      aria-disabled={disabled || undefined}
+      className={cn(segmentedTrackClass, size === 'sm' && 'rounded-xl p-1', disabled && 'opacity-50', className)}
+    >
       {items.map((item) => (
         <button
           key={item.value}
           type="button"
           role="radio"
           aria-checked={item.value === value}
+          disabled={disabled}
           onClick={() => onChange(item.value)}
-          className={segmentVariants({ active: item.value === value, size })}
+          className={cn(segmentVariants({ active: item.value === value, size }), disabled && 'cursor-not-allowed')}
         >
           {item.label}
         </button>

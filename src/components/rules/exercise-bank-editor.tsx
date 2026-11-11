@@ -1,6 +1,6 @@
 'use client';
 
-import { Pencil, Plus, X } from 'lucide-react';
+import { Pencil, Plus, SearchX, Sparkles, X } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import { Toggle } from '@/components/ui/toggle';
 import { cn } from '@/lib/cn';
 import { describeEquipment } from '@/lib/domain/functional/availability';
 import { BLOCK_LABELS, FUNCTIONAL_BLOCK_KEYS } from '@/lib/domain/functional/constants';
+import { missingSeedExercises } from '@/lib/domain/functional/exercise-bank';
 import type { BankExercise, FunctionalBlockKey } from '@/lib/domain/functional/types';
 import { useAppState } from '@/providers/app-state-provider';
 import { ExerciseForm } from './exercise-form';
@@ -38,6 +39,9 @@ export function ExerciseBankEditor() {
     (e) => (filter === 'todos' || e.blocks.includes(filter)) && (!query || e.name.toLowerCase().includes(query)),
   );
   const activeCount = exerciseBank.filter((e) => e.active).length;
+  // The saved bank is the coach's copy: catalogue additions only reach it when they accept them here.
+  const newFromCatalogue = missingSeedExercises(exerciseBank);
+  const addFromCatalogue = () => setExerciseBank((prev) => [...prev, ...missingSeedExercises(prev)]);
 
   const save = (exercise: BankExercise) => {
     setExerciseBank((prev) =>
@@ -90,6 +94,30 @@ export function ExerciseBankEditor() {
       <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
         {activeCount} de {exerciseBank.length} ejercicios activos. Los desactivados no entran al generador.
       </p>
+
+      {newFromCatalogue.length > 0 && (
+        <Card variant="inset" className="flex flex-col gap-3 border-brand-200 bg-brand-50/60 sm:flex-row sm:items-center sm:justify-between dark:border-brand-900/50 dark:bg-brand-950/20">
+          <div className="min-w-0">
+            <p className="flex items-center gap-2 text-xs font-black text-zinc-900 dark:text-zinc-100">
+              <Sparkles className="size-4 text-brand-500" />
+              {newFromCatalogue.length} ejercicios nuevos en el catálogo
+            </p>
+            <p className="mt-1 line-clamp-2 text-[11px] text-zinc-600 dark:text-zinc-400">
+              {newFromCatalogue.map((e) => e.name).join(' · ')}
+            </p>
+          </div>
+          <Button size="sm" onClick={addFromCatalogue} className="shrink-0">
+            <Plus className="size-3.5" /> Añadir al banco
+          </Button>
+        </Card>
+      )}
+
+      {visible.length === 0 && (
+        <Card variant="tile" className="flex flex-col items-center gap-2 py-10 text-center">
+          <SearchX className="size-6 text-zinc-300 dark:text-zinc-600" />
+          <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400">Ningún ejercicio coincide con la búsqueda.</p>
+        </Card>
+      )}
 
       <ul className="space-y-3">
         {visible.map((exercise) => (
